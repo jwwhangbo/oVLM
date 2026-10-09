@@ -19,6 +19,7 @@ dependencies = [
 
 [project.scripts]
 ovlm = "ovlm.main:app"
+"tools.visualize" = "ovlm.tools.visualize:app"
 
 [build-system]
 requires = ["hatchling"]

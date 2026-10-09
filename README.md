@@ -4,7 +4,7 @@ oVLM is a project conceived to make vision-language model (VLM) inference easier
 
 Serving a VLM involves more than accepting an image alongside a prompt. Model-specific input formats, preprocessing, multi-image inputs, and batching can make a complete inference workflow difficult to put together. oVLM aims to bring model management, inference, and API serving into a straightforward CLI while preserving the capabilities of supported models.
 
-> **Status:** Early development. The oVLM capabilities and commands below describe the intended interface, not implemented functionality.
+> **Status:** Early development. SAM3 image inference and piped visualization are implemented; the other capabilities below describe the intended interface.
 
 ## A. Comparison with Ollama and vLLM
 
@@ -30,6 +30,26 @@ Comparison references: [Ollama vision documentation](https://docs.ollama.com/cap
 The current project metadata requires Python 3.12. Package installation and CLI setup will be documented once available.
 
 ## C. How to use
+
+### Image inference and visualization (implemented)
+
+`ovlm run` writes JSON to stdout containing the absolute source image path,
+pixel-coordinate boxes, scores, and masks compressed as COCO RLE. The visualization
+utility reads that JSON and writes a PNG with colored masks, boxes, and scores.
+The source image must remain accessible to the renderer.
+
+```powershell
+# PowerShell 7.4+ preserves binary PNG data when using >.
+$PSNativeCommandArgumentPassing = 'Legacy'
+uv run ovlm run sam3 `
+  --image 'C:\Users\jonny\Downloads\IMG_2094.heic_compressed.JPEG' `
+  --prompt '{\"texts\": [\"flamingo\"]}' |
+  uv run tools.visualize > output.png
+```
+
+On older PowerShell versions, replace the last line with
+`uv run tools.visualize --output output.png` to save the PNG directly.
+SAM3 currently accepts exactly one text phrase in `texts`.
 
 **TODO:** Finalize the CLI interface and add working examples.
 

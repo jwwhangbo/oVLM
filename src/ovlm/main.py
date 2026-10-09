@@ -4,6 +4,7 @@ import typer
 import uvicorn
 from pydantic import ValidationError
 from ovlm._internal.registry import get_model
+from ovlm._internal.output import serialize_result
 from ovlm._types.common import ImageInferenceRequest, Prompt
 from ovlm.api import app as fastapp
 from PIL import Image
@@ -34,7 +35,7 @@ def run(
                 prompt=parsed_prompt,
             )
         )
-        print(output)
+        print(serialize_result(image, output))
 
 
 if __name__ == "__main__":
