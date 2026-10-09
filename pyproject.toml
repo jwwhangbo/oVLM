@@ -3,10 +3,16 @@ name = "ovlm"
 version = "0.1.0"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "einops>=0.8.2",
     "fastapi>=0.143.0",
+    "psutil>=7.2.2",
+    "pycocotools>=2.0.11",
+    "pydantic>=2.14.0",
     "sam3",
     "torch>=2.14.1",
     "torchvision>=0.29.1",
+    "triton>=3.8,<3.9; sys_platform == 'linux'",
+    "triton-windows>=3.8,<3.9; sys_platform == 'win32'",
     "typer>=0.27.3",
     "uvicorn>=0.54.0",
 ]
