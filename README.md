@@ -61,6 +61,15 @@ Removal leaves configuration files and other cached revisions in place. If the
 checkpoint path is a symlink, only the link is removed; shared backing files
 remain in the Hugging Face cache and may be reused on the next pull.
 
+### List local models through the API (implemented)
+
+`GET /api/model` returns a sorted JSON array of supported model names with local
+checkpoints, for example `["sam3"]`. It returns `[]` if none are available.
+Availability is checked on every request, so `pull` and `rm` are reflected without
+restarting the server. Listing does not download weights or build models. For
+SAM3, discovery checks its Hugging Face cache; arbitrary custom checkpoint paths
+are not registered by this endpoint.
+
 ### Image inference and visualization (implemented)
 
 `ovlm run` writes JSON to stdout containing the absolute source image path,

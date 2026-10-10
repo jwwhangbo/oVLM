@@ -1,6 +1,7 @@
 from functools import cache
 from importlib import import_module
 from inspect import getmembers, isabstract, isclass
+from pathlib import Path
 from pkgutil import iter_modules
 
 from ovlm import vlms
@@ -39,3 +40,13 @@ def get_model(name: str) -> VLM:
             f"Unknown VLM {name!r}. Available: {', '.join(sorted(models))}"
         )
     return models[name]()
+
+
+def list_local_models() -> list[str]:
+    """List supported models with local checkpoints, checking availability each call."""
+    available = []
+    for name, model_cls in _discover_models().items():
+        path = model_cls().find_cached_weights()
+        if path is not None and Path(path).is_file():
+            available.append(name)
+    return sorted(available)

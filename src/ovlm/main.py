@@ -12,9 +12,12 @@ from PIL import Image
 app = typer.Typer()
 
 @app.command()
-def serve(model: str):
-    print(f"serving {model}")
+def serve(daemon: Annotated[bool, typer.Option(help="runs the api as a daemon process")]):
     uvicorn.run(fastapp, host="127.0.0.1")
+
+@app.command()
+def down():
+    pass
 
 @app.command()
 def pull(model: Annotated[str, typer.Argument(help="name of model to download")]):
