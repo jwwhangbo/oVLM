@@ -4,13 +4,19 @@ from sam3.model_builder import build_sam3_image_model
 from sam3.model.sam3_image_processor import Sam3Processor
 
 from ovlm._model._vlm import VLM
-from ovlm._types.common import ImageInferenceRequest, ImageInferenceResponse
+from ovlm._types.capabilities import ModelCapability
+from ovlm._types.image import ImageInput, ImageOutput
 
 
 class SAM3(VLM):
     name = "sam3"
+    capabilities = frozenset({
+        ModelCapability.IMAGE,
+        ModelCapability.VIDEO,
+        ModelCapability.IMAGE_BATCH,
+    })
 
-    def infer_image(self, request: ImageInferenceRequest) -> ImageInferenceResponse:
+    def infer_image(self, request: ImageInput) -> ImageOutput:
         if request.prompt is None:
             raise ValueError("SAM3 requires a prompt")
         if not request.prompt.texts or len(request.prompt.texts) != 1:
@@ -25,7 +31,7 @@ class SAM3(VLM):
             output = processor.set_text_prompt(
                 state=inference_state, prompt=request.prompt.texts[0]
             )
-        return ImageInferenceResponse(
+        return ImageOutput(
             masks=output["masks"],
             boxes=output["boxes"],
             scores=output["scores"],

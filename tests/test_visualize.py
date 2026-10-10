@@ -11,14 +11,14 @@ from PIL import Image
 from pycocotools import mask as mask_utils
 
 from ovlm._internal.output import serialize_result
-from ovlm._types.common import ImageInferenceResponse
+from ovlm._types.image import ImageOutput
 
 
 class VisualizationTests(unittest.TestCase):
     def test_bfloat16_tensor_results_are_json_serializable(self):
         import torch
 
-        payload = json.loads(serialize_result("image.png", ImageInferenceResponse(
+        payload = json.loads(serialize_result("image.png", ImageOutput(
             masks=torch.ones((1, 1, 2, 2), dtype=torch.bool),
             boxes=torch.tensor([[0, 0, 2, 2]], dtype=torch.bfloat16),
             scores=torch.tensor([0.5], dtype=torch.bfloat16),
@@ -32,7 +32,7 @@ class VisualizationTests(unittest.TestCase):
             Image.new("RGB", (40, 40), "white").save(image)
             masks = np.zeros((1, 1, 40, 40), dtype=bool)
             masks[0, 0, 10:30, 10:30] = True
-            payload = serialize_result(str(image), ImageInferenceResponse(
+            payload = serialize_result(str(image), ImageOutput(
                 masks=masks, boxes=np.array([[10, 10, 30, 30]]), scores=np.array([0.9]),
             ))
             rle = json.loads(payload)["masks"][0]
@@ -52,7 +52,7 @@ class VisualizationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             image, output = Path(directory) / "source.png", Path(directory) / "output.png"
             Image.new("RGB", (10, 10), "white").save(image)
-            payload = serialize_result(str(image), ImageInferenceResponse(
+            payload = serialize_result(str(image), ImageOutput(
                 masks=np.zeros((0, 1, 10, 10)), boxes=np.zeros((0, 4)), scores=np.zeros(0),
             ))
             result = subprocess.run(

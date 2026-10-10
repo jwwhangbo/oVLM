@@ -1,3 +1,5 @@
+"""Internal image inference inputs, outputs, and prompts."""
+
 from typing import Any, Optional
 from typing import Type
 from typing import Union
@@ -82,13 +84,13 @@ class Prompt(pydantic.BaseModel):
             )
         return self
 
-class ImageInferenceRequest(pydantic.BaseModel):
+class ImageInput(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
 
     image: PILImage.Image
     prompt: Optional[Prompt] = pydantic.Field(default=None)
 
-class ImageInferenceResponse(pydantic.BaseModel): 
+class ImageOutput(pydantic.BaseModel):
     masks: Any
     boxes: Any
     scores: Any

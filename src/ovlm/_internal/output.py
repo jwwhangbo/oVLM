@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 from pycocotools import mask as mask_utils
 
-from ovlm._types.common import ImageInferenceResponse
+from ovlm._types.image import ImageOutput
 
 
 def _array(value):
@@ -18,7 +18,7 @@ def _array(value):
     return np.asarray(value)
 
 
-def serialize_result(image: str, output: ImageInferenceResponse) -> str:
+def serialize_result(image: str, output: ImageOutput) -> str:
     masks = _array(output.masks)
     if masks.ndim == 4 and masks.shape[1] == 1:
         masks = masks[:, 0]

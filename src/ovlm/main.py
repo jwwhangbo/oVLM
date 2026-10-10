@@ -5,7 +5,7 @@ import uvicorn
 from pydantic import ValidationError
 from ovlm._internal.registry import get_model
 from ovlm._internal.output import serialize_result
-from ovlm._types.common import ImageInferenceRequest, Prompt
+from ovlm._types.image import ImageInput, Prompt
 from ovlm.api import app as fastapp
 from PIL import Image
 
@@ -30,7 +30,7 @@ def run(
     vlm = get_model(model)
     with Image.open(image) as pil_image:
         output = vlm.infer_image(
-            ImageInferenceRequest(
+            ImageInput(
                 image=pil_image.convert("RGB"),
                 prompt=parsed_prompt,
             )
