@@ -27,7 +27,10 @@ def serialize_result(image: str, output: ImageOutput) -> str:
     encoded = []
     for mask in masks:
         rle = mask_utils.encode(np.asfortranarray(mask, dtype=np.uint8))
-        encoded.append({"size": rle["size"], "counts": rle["counts"].decode("ascii")})
+        counts = rle["counts"]
+        if isinstance(counts, bytes):
+            counts = counts.decode("ascii")
+        encoded.append({"size": rle["size"], "counts": counts})
     return json.dumps({
         "image": str(Path(image).resolve()),
         "masks": encoded,

@@ -5,6 +5,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import numpy as np
 from PIL import Image
@@ -15,6 +16,16 @@ from ovlm._types.image import ImageOutput
 
 
 class VisualizationTests(unittest.TestCase):
+    def test_string_rle_counts_are_json_serializable(self):
+        with patch("ovlm._internal.output.mask_utils.encode", return_value={
+            "size": [2, 2], "counts": "04",
+        }):
+            payload = json.loads(serialize_result("image.png", ImageOutput(
+                masks=np.ones((1, 2, 2), dtype=bool),
+                boxes=np.array([[0, 0, 2, 2]]), scores=np.array([0.5]),
+            )))
+        self.assertEqual(payload["masks"], [{"size": [2, 2], "counts": "04"}])
+
     def test_bfloat16_tensor_results_are_json_serializable(self):
         import torch
 
