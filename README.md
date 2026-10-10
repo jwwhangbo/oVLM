@@ -4,7 +4,7 @@ oVLM is a project conceived to make vision-language model (VLM) inference easier
 
 Serving a VLM involves more than accepting an image alongside a prompt. Model-specific input formats, preprocessing, multi-image inputs, and batching can make a complete inference workflow difficult to put together. oVLM aims to bring model management, inference, and API serving into a straightforward CLI while preserving the capabilities of supported models.
 
-> **Status:** Early development. SAM3 image inference and piped visualization are implemented; the other capabilities below describe the intended interface.
+> **Status:** Early development. SAM3 checkpoint pulling and removal, image inference, and piped visualization are implemented; the other capabilities below describe the intended interface.
 
 ## A. Comparison with Ollama and vLLM
 
@@ -30,6 +30,36 @@ Comparison references: [Ollama vision documentation](https://docs.ollama.com/cap
 The current project metadata requires Python 3.12. Package installation and CLI setup will be documented once available.
 
 ## C. How to use
+
+### Download SAM3 weights (implemented)
+
+```sh
+uv run ovlm pull sam3
+```
+
+This downloads SAM3's checkpoint and configuration into the Hugging Face cache
+without building the model. Existing cached downloads are reused. SAM3 requires
+access to the gated `facebook/sam3` repository; authenticate with `hf auth login`
+after obtaining access.
+
+Inference uses local weights when available. If they are missing, it prints a
+notice to stderr, downloads them, and continues inference. You can also provide
+a checkpoint in Python with `SAM3(weights_path="path/to/sam3.pt")`.
+
+### Remove SAM3's local checkpoint (implemented)
+
+```sh
+uv run ovlm rm sam3
+```
+
+This deletes the local checkpoint path without downloading anything. If no local
+checkpoint exists, it reports that and exits successfully. The next inference
+call pulls the weights again automatically. In Python, `SAM3(weights_path="path/to/sam3.pt").rm()`
+removes that specific checkpoint.
+
+Removal leaves configuration files and other cached revisions in place. If the
+checkpoint path is a symlink, only the link is removed; shared backing files
+remain in the Hugging Face cache and may be reused on the next pull.
 
 ### Image inference and visualization (implemented)
 
@@ -59,10 +89,11 @@ The planned CLI provides the following commands:
 | --- | --- |
 | `ovlm list` | List locally available models. |
 | `ovlm pull <model>` | Download a model for local inference. |
+| `ovlm rm <model>` | Remove the local checkpoint path. |
 | `ovlm run <model>` | Run inference with a selected model. |
 | `ovlm serve` | Start the FastAPI inference server. |
 
-Illustrative workflow (commands are not yet implemented):
+Illustrative workflow (`list` and inference API serving are still planned):
 
 ```sh
 ovlm pull <model>

@@ -17,6 +17,40 @@ def serve(model: str):
     uvicorn.run(fastapp, host="127.0.0.1")
 
 @app.command()
+def pull(model: Annotated[str, typer.Argument(help="name of model to download")]):
+    """Download model weights for local inference."""
+    try:
+        vlm = get_model(model)
+    except ValueError as exc:
+        raise typer.BadParameter(str(exc), param_hint="model") from exc
+
+    try:
+        weights_path = vlm.pull()
+    except OSError as exc:
+        typer.echo(f"Cannot pull {model}: {exc}", err=True)
+        raise typer.Exit(code=1) from exc
+    typer.echo(f"Weights for {model} are available at {weights_path}")
+
+@app.command()
+def rm(model: Annotated[str, typer.Argument(help="name of model whose local checkpoint to remove")]):
+    """Delete a model's local checkpoint path."""
+    try:
+        vlm = get_model(model)
+    except ValueError as exc:
+        raise typer.BadParameter(str(exc), param_hint="model") from exc
+
+    try:
+        weights_path = vlm.rm()
+    except OSError as exc:
+        typer.echo(f"Cannot remove {model}: {exc}", err=True)
+        raise typer.Exit(code=1) from exc
+
+    if weights_path is None:
+        typer.echo(f"No local weights are available for {model}.")
+    else:
+        typer.echo(f"Removed checkpoint for {model}: {weights_path}")
+
+@app.command()
 def run(
         model: Annotated[str, typer.Argument(help="name of model to run inference")],
         image: Annotated[str, typer.Option(help="location of the image to run inference on")],
